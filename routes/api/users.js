@@ -4,7 +4,7 @@ const router = express.Router();
 
 const ctrl = require("../../controllers/users");
 
-const { validateBody, authenticate } = require("../../middlewares");
+const { validateBody, authenticate, upload } = require("../../middlewares");
 
 const {
   registerSchema,
@@ -25,6 +25,13 @@ router.patch(
   authenticate,
   validateBody(updateSubSchema),
   ctrl.updateSubscription
+);
+
+router.patch(
+  "/avatars",
+  authenticate,
+  upload.single("picture"),
+  ctrl.updateAvatar
 );
 
 module.exports = router;
