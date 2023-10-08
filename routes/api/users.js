@@ -30,7 +30,7 @@ router.patch(
 router.patch(
   "/avatars",
   authenticate,
-  upload.single("picture"),
+  upload.single("avatar"),
   ctrl.updateAvatar
 );
 

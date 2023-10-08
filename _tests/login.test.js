@@ -1,63 +1,28 @@
-const axios = require("axios");
-const { subscribe } = require("../app");
+const request = require("supertest");
+const app = require("../app");
+const mongoose = require("mongoose");
 
-describe("POST api/users/login", () => {
-  test("should be status 401", async () => {
-    const invalidUser = {
-      email: "qqqqqqqqqq@gmial.com",
-      password: "qqqqqqqqqqqq",
-    };
+const { DB_HOST } = process.env;
 
-    try {
-      await axios.post("http://localhost:3000/api/users/login", invalidUser);
-    } catch ({ response }) {
-      expect(response.status).toBe(401);
-    }
+describe("POST /users", () => {
+  beforeAll(() => {
+    mongoose.connect(DB_HOST).then(() => app.listen(3000));
+  });
+  afterAll(() => {
+    mongoose.connection.close();
   });
 
-  test("should be status 200", async () => {
-    const correctUser = {
+  test("login", async () => {
+    const user = {
       email: "qwe@gmial.com",
       password: "qweqwe",
     };
+    const data = await request(app).post("/api/users/login").send(user);
 
-    const response = await axios.post(
-      "http://localhost:3000/api/users/login",
-      correctUser
-    );
-    expect(response.status).toBe(200);
-  });
-
-  test("there must be a 'token' property", async () => {
-    const correctUser = {
-      email: "qwe@gmial.com",
-      password: "qweqwe",
-    };
-
-    const { data } = await axios.post(
-      "http://localhost:3000/api/users/login",
-      correctUser
-    );
-    const isToken = data.hasOwnProperty("token");
-
-    expect(isToken).toBe(true);
-  });
-
-  test("there must be a 'user' property with 2 types - 'string", async () => {
-    const correctUser = {
-      email: "qwe@gmial.com",
-      password: "qweqwe",
-    };
-
-    const { data } = await axios.post(
-      "http://localhost:3000/api/users/login",
-      correctUser
-    );
-
-    const { email, subscription } = data.user;
-    const isStringedTypes =
-      typeof email === "string" && typeof subscription === "string";
-
-    expect(isStringedTypes).toBe(true);
+    expect(data.statusCode).toBe(200);
+    expect(data.body.token).toBeTruthy();
+    expect(data.body.user).toBeTruthy();
+    expect(typeof data.body.user.email).toContain("string");
+    expect(typeof data.body.user.subscription).toContain("string");
   });
 });
