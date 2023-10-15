@@ -10,6 +10,7 @@ const {
   registerSchema,
   loginSchema,
   updateSubSchema,
+  verifySchema,
 } = require("../../models/users");
 
 router.post("/register", validateBody(registerSchema), ctrl.register);
@@ -33,5 +34,9 @@ router.patch(
   upload.single("avatar"),
   ctrl.updateAvatar
 );
+
+router.get("/verify/:verificationToken", ctrl.verificateUser);
+
+router.post("/verify", validateBody(verifySchema), ctrl.resendVerify);
 
 module.exports = router;

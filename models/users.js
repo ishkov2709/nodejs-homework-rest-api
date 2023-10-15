@@ -31,6 +31,14 @@ const userSchema = new Schema(
     avatarURL: {
       type: String,
     },
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      required: [true, "Verify token is required"],
+    },
   },
   { versionKey: false }
 );
@@ -59,6 +67,13 @@ const updateSubSchema = Joi.object({
   "any.required": `{#label} is a required field`,
 });
 
+const verifySchema = Joi.object({
+  email: Joi.string().required().pattern(emailPattern),
+}).messages({
+  "string.pattern.base": "{#label} in not valid",
+  "any.required": `missing required field {#label}`,
+});
+
 const User = model("user", userSchema);
 
 module.exports = {
@@ -66,4 +81,5 @@ module.exports = {
   registerSchema,
   loginSchema,
   updateSubSchema,
+  verifySchema,
 };
