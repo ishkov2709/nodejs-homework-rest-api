@@ -2,10 +2,10 @@ const { HttpError } = require("../helpers");
 
 const validateBody = (schema) => {
   const foo = (req, _, next) => {
-    const { method, body } = req;
+    const { method, body, route } = req;
     const countKeys = Object.keys(body).length;
 
-    if (!countKeys && method !== "PATCH") {
+    if (!countKeys && method !== "PATCH" && route.path !== "/verify") {
       next(HttpError(400, "missing fields"));
     }
 
